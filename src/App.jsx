@@ -226,7 +226,7 @@ function RRow({r,onDel,onEdit}){
 const STEPS=["tipo","monto","quien","categoria","confirmar"];
 function QuickForm({onSave,onClose}){
   const [step,setStep]=useState(0);
-  const [f,setF]=useState({type:"gasto",amount:"",desc:"",who:"yo",cat:"otros",date:today()});
+  const [f,setF]=useState({type:"gasto",amount:"",desc:"",who:"yo",paidBy:"mane",cat:"otros",date:today()});
   const sf=(k,v)=>setF(p=>({...p,[k]:v}));
   const amtRef=useRef(null);
   useEffect(()=>{if(step===1&&amtRef.current)amtRef.current.focus();},[step]);
@@ -235,6 +235,113 @@ function QuickForm({onSave,onClose}){
     if(!f.amount||+f.amount<=0||!f.desc.trim())return;
     onSave({id:Date.now(),...f,amount:+f.amount,description:f.desc.trim(),category:f.cat});onClose();
   }
+  return(
+    <div style={{position:"fixed",inset:0,background:"#00000090",zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center",backdropFilter:"blur(6px)"}}
+      onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <div className="rise" style={{background:"var(--s1)",borderRadius:"22px 22px 0 0",border:"1px solid var(--b1)",borderBottom:"none",padding:"20px 18px 36px",width:"100%",maxWidth:430}}>
+        <div style={{width:34,height:3,borderRadius:2,background:"var(--b2)",margin:"0 auto 16px"}}/>
+        <div style={{display:"flex",gap:5,justifyContent:"center",marginBottom:20}}>
+          {STEPS.map((_,i)=><div key={i} className={`step-dot${i<=step?" on":""}`}/>)}
+        </div>
+        {step===0&&(
+          <div className="up">
+            <div className="lbl" style={{textAlign:"center",marginBottom:14}}>¿Qué es?</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:8}}>
+              {[{id:"gasto",e:"💸",l:"Gasto"},{id:"ingreso",e:"💰",l:"Ingreso"}].map(t=>(
+                <button key={t.id} onClick={()=>{sf("type",t.id);setStep(1);}} style={{padding:"22px 8px",borderRadius:16,border:`2px solid ${f.type===t.id?"var(--yo)":"var(--b1)"}`,background:f.type===t.id?"#4f8aff14":"var(--s2)",color:f.type===t.id?"var(--yo)":"var(--txt2)",fontSize:13,fontWeight:700}}>
+                  <div style={{fontSize:28,marginBottom:6}}>{t.e}</div>{t.l}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {step===1&&(
+          <div className="up">
+            <div className="lbl" style={{textAlign:"center",marginBottom:10}}>¿Cuánto y en qué?</div>
+            <div style={{position:"relative",marginBottom:10}}>
+              <span style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",fontFamily:"var(--head)",fontSize:22,fontWeight:800,color:"var(--txt3)"}}>$</span>
+              <input ref={amtRef} type="number" value={f.amount} onChange={e=>sf("amount",e.target.value)} placeholder="0" inputMode="numeric"
+                style={{width:"100%",background:"var(--s2)",border:`1.5px solid ${f.amount?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"16px 14px 16px 36px",color:"var(--txt)",fontSize:28,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
+            </div>
+            <input value={f.desc} onChange={e=>sf("desc",e.target.value)} placeholder="¿En qué? (ej: Cena, Uber…)"
+              style={{width:"100%",background:"var(--s2)",border:`1.5px solid ${f.desc?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"13px 14px",color:"var(--txt)",fontSize:14,marginBottom:10}}/>
+            <input type="date" value={f.date} onChange={e=>sf("date",e.target.value)}
+              style={{width:"100%",background:"var(--s2)",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,marginBottom:14,colorScheme:"dark"}}/>
+            <button onClick={()=>{if(f.amount&&f.desc.trim())setStep(2);}} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:f.amount&&f.desc.trim()?"linear-gradient(135deg,var(--yo),#9b6fff)":"var(--b1)",color:f.amount&&f.desc.trim()?"#fff":"var(--txt3)",fontSize:14,fontWeight:700}}>Siguiente →</button>
+          </div>
+        )}
+        {step===2&&(
+          <div className="up">
+            <div className="lbl" style={{textAlign:"center",marginBottom:14}}>¿Tipo de gasto?</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:f.who==="compartido"?14:0}}>
+              {WHOS.map(w=>(
+                <button key={w.id} onClick={()=>sf("who",w.id)} style={{padding:"16px 8px",borderRadius:14,border:`2px solid ${f.who===w.id?w.c:"var(--b1)"}`,background:f.who===w.id?`${w.c}18`:"var(--s2)",color:f.who===w.id?w.c:"var(--txt2)",fontSize:12,fontWeight:700}}>
+                  <div style={{fontSize:22,marginBottom:5}}>{w.e}</div>
+                  <div>{w.label}</div>
+                  <div style={{fontSize:10,opacity:.6,marginTop:2}}>{w.hint}</div>
+                </button>
+              ))}
+            </div>
+            {/* If compartido, ask who physically paid */}
+            {f.who==="compartido"&&(
+              <div style={{marginTop:4}}>
+                <div className="lbl" style={{textAlign:"center",marginBottom:10}}>¿Quién pagó físicamente?</div>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:14}}>
+                  {[{id:"mane",e:"🧑",l:"Mane pagó"},{id:"majo",e:"👩",l:"Majo pagó"}].map(p=>(
+                    <button key={p.id} onClick={()=>sf("paidBy",p.id)} style={{padding:"12px 8px",borderRadius:14,border:`2px solid ${f.paidBy===p.id?"var(--joint)":"var(--b1)"}`,background:f.paidBy===p.id?"#00d68f18":"var(--s2)",color:f.paidBy===p.id?"var(--joint)":"var(--txt2)",fontSize:12,fontWeight:700}}>
+                      <div style={{fontSize:20,marginBottom:4}}>{p.e}</div>{p.l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* Explanation of what it means */}
+            <div style={{background:"var(--b1)",borderRadius:10,padding:"10px 12px",fontSize:11,color:"var(--txt2)",marginTop:4}}>
+              {f.who==="yo"     && "🧑 Mane pagó un gasto de Majo → Majo te debe el total"}
+              {f.who==="ella"   && "👩 Majo pagó un gasto de Mane → Tú le debes el total"}
+              {f.who==="compartido" && f.paidBy==="mane" && "🤝 Gasto 50/50 · Mane pagó → Majo te debe la mitad"}
+              {f.who==="compartido" && f.paidBy==="majo" && "🤝 Gasto 50/50 · Majo pagó → Tú le debes la mitad"}
+              {f.who==="personal" && "👤 Gasto solo tuyo · no afecta el balance"}
+            </div>
+            <button onClick={()=>setStep(3)} style={{width:"100%",padding:13,borderRadius:14,border:"none",background:"linear-gradient(135deg,var(--yo),#9b6fff)",color:"#fff",fontSize:14,fontWeight:700,marginTop:12}}>Siguiente →</button>
+          </div>
+        )}
+        {step===3&&(
+          <div className="up">
+            <div className="lbl" style={{textAlign:"center",marginBottom:12}}>Categoría</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
+              {CATS.map(c=>(
+                <button key={c.id} onClick={()=>{sf("cat",c.id);setStep(4);}} style={{padding:"12px 4px",borderRadius:12,border:`2px solid ${f.cat===c.id?c.c:"var(--b1)"}`,background:f.cat===c.id?`${c.c}18`:"var(--s2)",color:f.cat===c.id?c.c:"var(--txt2)",fontSize:11,fontWeight:700,textAlign:"center"}}>
+                  <div style={{fontSize:20,marginBottom:4}}>{c.e}</div>{c.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {step===4&&(
+          <div className="up">
+            <div className="lbl" style={{textAlign:"center",marginBottom:16}}>Confirmar</div>
+            <div style={{background:"var(--s2)",border:"1px solid var(--b1)",borderRadius:16,padding:16,marginBottom:16}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                <span style={{color:"var(--txt2)",fontSize:13}}>{f.type==="gasto"?"💸 Gasto":"💰 Ingreso"}</span>
+                <span className="amt" style={{fontSize:22,color:f.type==="ingreso"?"var(--inc)":who?.c}}>{$mxn(+f.amount)}</span>
+              </div>
+              <div style={{fontSize:15,fontWeight:700,marginBottom:8}}>{f.desc}</div>
+              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                <span className="pill" style={{background:`${who?.c}18`,color:who?.c}}>{who?.e} {who?.label}</span>
+                {f.who==="compartido"&&<span className="pill" style={{background:"#00d68f18",color:"var(--joint)"}}>Pagó: {f.paidBy==="mane"?"🧑 Mane":"👩 Majo"}</span>}
+                <span className="pill" style={{background:`${cat?.c}18`,color:cat?.c}}>{cat?.e} {cat?.label}</span>
+                <span className="pill" style={{background:"var(--b1)",color:"var(--txt2)"}}>{$d(f.date)}</span>
+              </div>
+            </div>
+            <button onClick={save} style={{width:"100%",padding:15,borderRadius:14,border:"none",background:"linear-gradient(135deg,var(--yo),#9b6fff)",color:"#fff",fontSize:15,fontWeight:800,boxShadow:"0 6px 22px #4f8aff35",marginBottom:8}}>✓ Guardar</button>
+            <button onClick={()=>setStep(0)} style={{width:"100%",padding:11,borderRadius:14,border:"1px solid var(--b1)",background:"none",color:"var(--txt2)",fontSize:13,fontWeight:600}}>Editar</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
   return(
     <div style={{position:"fixed",inset:0,background:"#00000090",zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center",backdropFilter:"blur(6px)"}}
       onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
@@ -674,15 +781,65 @@ export default function App(){
     const pp=recs.filter(r=>r.type==="gasto"&&r.who==="personal");
     const tg=pg.reduce((s,r)=>s+r.amount,0);
     const ti=pi.reduce((s,r)=>s+r.amount,0);
-    const yp=pg.filter(r=>r.who==="yo").reduce((s,r)=>s+r.amount,0);
-    const ep=pg.filter(r=>r.who==="ella").reduce((s,r)=>s+r.amount,0);
-    const cp=pg.filter(r=>r.who==="compartido").reduce((s,r)=>s+r.amount,0);
     const ptg=pp.reduce((s,r)=>s+r.amount,0);
-    // subtract pareja payments from diff
-    const totalPagado=pagos.reduce((s,p)=>s+p.amount,0);
-    const rawDiff=yp-ep;
-    // if rawDiff>0 majo owes mane; payments from majo reduce it
-    const adjDiff=rawDiff>0?Math.max(0,rawDiff-totalPagado):Math.min(0,rawDiff+totalPagado);
+
+    // ── Lógica correcta de balance ──
+    // "yo" pagó gasto de Majo completo → Majo me debe el total
+    // "ella" pagó gasto de Mane completo → yo le debo el total
+    // "compartido" Mane pagó → Majo me debe la mitad
+    // "compartido" Majo pagó → yo le debo la mitad
+    //
+    // Implementación: cada gasto tiene who=quien_pago y category+desc
+    // pero necesitamos saber "para quién era" — usamos los campos who:
+    //   who="yo"         → Mane pagó un gasto de MAJO   → Majo debe 100%
+    //   who="ella"       → Majo pagó un gasto de MANE   → Mane debe 100%
+    //   who="compartido" → gasto entre los dos, quien lo pagó puso el dinero
+    //
+    // Separamos compartidos por quien los pagó usando el campo "paidBy"
+    // Como no tenemos ese campo, usamos la convención:
+    //   who="yo"         = Mane pagó algo que es de/para Majo  → Majo debe todo
+    //   who="ella"       = Majo pagó algo que es de/para Mane  → Mane debe todo
+    //   who="compartido" = gasto 50/50, Mane pagó              → Majo debe mitad
+    //
+    // Para distinguir "compartido pagado por Majo" necesitamos el campo paidBy
+    // que ya guardamos — si no existe, asumimos Mane pagó el compartido.
+
+    let majoMeDebe = 0;  // Majo le debe a Mane
+    let yoLeDebo   = 0;  // Mane le debe a Majo
+
+    pg.forEach(r => {
+      const paidBy = r.paidBy || "mane"; // quién físicamente pagó
+      if (r.who === "yo") {
+        // Mane pagó un gasto que era de Majo → Majo debe el total
+        majoMeDebe += r.amount;
+      } else if (r.who === "ella") {
+        // Majo pagó un gasto que era de Mane → Mane debe el total
+        yoLeDebo += r.amount;
+      } else if (r.who === "compartido") {
+        // Gasto 50/50 — quien pagó pone el dinero, el otro debe la mitad
+        if (paidBy === "majo") {
+          yoLeDebo += r.amount / 2;
+        } else {
+          // Mane pagó (default)
+          majoMeDebe += r.amount / 2;
+        }
+      }
+    });
+
+    // Total pagado por cada uno (para mostrar en UI)
+    const yp = pg.filter(r=>r.who==="yo"||r.who==="compartido").reduce((s,r)=>s+r.amount,0);
+    const ep = pg.filter(r=>r.who==="ella").reduce((s,r)=>s+r.amount,0);
+    const cp = pg.filter(r=>r.who==="compartido").reduce((s,r)=>s+r.amount,0);
+
+    // Balance neto: positivo = Majo me debe, negativo = yo le debo
+    const rawDiff = majoMeDebe - yoLeDebo;
+
+    // Descontar pagos ya realizados
+    const totalPagado = pagos.reduce((s,p)=>s+p.amount,0);
+    const adjDiff = rawDiff > 0
+      ? Math.max(0, rawDiff - totalPagado)
+      : Math.min(0, rawDiff + totalPagado);
+
     const cats=CATS.map(c=>({...c,v:pg.filter(r=>r.category===c.id).reduce((s,r)=>s+r.amount,0)})).filter(c=>c.v>0).sort((a,b)=>b.v-a.v);
     const pcats=CATS.map(c=>({...c,v:pp.filter(r=>r.category===c.id).reduce((s,r)=>s+r.amount,0)})).filter(c=>c.v>0).sort((a,b)=>b.v-a.v);
     const allGastos=[...pg,...pp];
@@ -974,23 +1131,23 @@ export default function App(){
             </div>
 
             <div className="card up" style={{animationDelay:"120ms",marginBottom:12}}>
-              <div className="lbl">Desglose pareja</div>
+              <div className="lbl">Desglose del balance</div>
               {[
-                {label:"Gastos de Mane",value:S.yp,color:"var(--yo)"},
-                {label:"Gastos de Majo",value:S.ep,color:"var(--ella)"},
-                {label:"Compartidos",value:S.cp,color:"var(--joint)"},
+                {label:"🧑 Mane pagó gasto de Majo",value:recs.filter(r=>r.who==="yo"&&r.type==="gasto").reduce((s,r)=>s+r.amount,0),color:"var(--yo)",hint:"Majo debe el total"},
+                {label:"🤝 Compartido · Mane pagó",value:recs.filter(r=>r.who==="compartido"&&r.type==="gasto"&&(r.paidBy||"mane")==="mane").reduce((s,r)=>s+r.amount/2,0),color:"var(--joint)",hint:"Majo debe la mitad"},
+                {label:"👩 Majo pagó gasto de Mane",value:recs.filter(r=>r.who==="ella"&&r.type==="gasto").reduce((s,r)=>s+r.amount,0),color:"var(--ella)",hint:"Mane debe el total"},
+                {label:"🤝 Compartido · Majo pagó",value:recs.filter(r=>r.who==="compartido"&&r.type==="gasto"&&r.paidBy==="majo").reduce((s,r)=>s+r.amount/2,0),color:"var(--ella)",hint:"Mane debe la mitad"},
               ].map(r=>(
                 <div key={r.label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid var(--b1)"}}>
-                  <span style={{fontSize:13,color:"var(--txt2)"}}>{r.label}</span>
+                  <div>
+                    <div style={{fontSize:12,color:"var(--txt2)"}}>{r.label}</div>
+                    <div style={{fontSize:10,color:"var(--txt3)",marginTop:1}}>{r.hint}</div>
+                  </div>
                   <span className="amt" style={{fontSize:13,color:r.color}}>{$mxn(r.value)}</span>
                 </div>
               ))}
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid var(--b1)"}}>
-                <span style={{fontSize:13,color:"var(--txt2)"}}>Diferencia bruta</span>
-                <span className="amt" style={{fontSize:13,color:"var(--txt)"}}>{$mxn(Math.abs(S.diff))}</span>
-              </div>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid var(--b1)"}}>
-                <span style={{fontSize:13,color:"var(--txt2)"}}>Ya pagado</span>
+                <span style={{fontSize:13,color:"var(--txt2)"}}>Ya pagado entre ustedes</span>
                 <span className="amt" style={{fontSize:13,color:"var(--joint)"}}>−{$mxn(pagos.reduce((s,p)=>s+p.amount,0))}</span>
               </div>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:10}}>
