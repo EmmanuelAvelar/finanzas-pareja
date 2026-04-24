@@ -226,27 +226,59 @@ function RRow({r,onDel,onEdit}){
 const STEPS=["tipo","monto","quien","categoria","confirmar"];
 function QuickForm({onSave,onClose}){
   const [step,setStep]=useState(0);
-  const [f,setF]=useState({type:"gasto",amount:"",desc:"",who:"yo",paidBy:"mane",cat:"otros",date:today()});
+  const [f,setF]=useState({type:"gasto",amount:"",desc:"",paidBy:"mane",forWhom:"ambos",cat:"otros",date:today()});
   const sf=(k,v)=>setF(p=>({...p,[k]:v}));
   const amtRef=useRef(null);
   useEffect(()=>{if(step===1&&amtRef.current)amtRef.current.focus();},[step]);
-  const cat=CATS.find(c=>c.id===f.cat),who=WHOS.find(w=>w.id===f.who);
+  const cat=CATS.find(c=>c.id===f.cat);
+
+  // Derive "who" field and balance impact from paidBy + forWhom
+  function deriveWho(){
+    if(f.forWhom==="personal") return "personal";
+    if(f.forWhom==="ambos")    return "compartido";
+    if(f.paidBy==="mane" && f.forWhom==="majo") return "yo";       // Mane pagó gasto de Majo
+    if(f.paidBy==="majo" && f.forWhom==="mane") return "ella";     // Majo pagó gasto de Mane
+    if(f.paidBy==="mane" && f.forWhom==="mane") return "personal"; // Mane pagó su propio gasto
+    if(f.paidBy==="majo" && f.forWhom==="majo") return "personal"; // Majo pagó su propio gasto (no afecta Mane)
+    return "compartido";
+  }
+
+  function balanceMsg(){
+    if(f.type==="ingreso") return "💰 Ingreso registrado";
+    if(f.forWhom==="personal") return "👤 Gasto personal · no afecta el balance de pareja";
+    if(f.forWhom==="ambos" && f.paidBy==="mane") return `🤝 Gasto compartido · Mane pagó $${f.amount||0} · Majo te debe $${((+f.amount||0)/2).toFixed(0)}`;
+    if(f.forWhom==="ambos" && f.paidBy==="majo") return `🤝 Gasto compartido · Majo pagó $${f.amount||0} · Tú le debes $${((+f.amount||0)/2).toFixed(0)}`;
+    if(f.paidBy==="mane" && f.forWhom==="majo") return `🧑 Mane pagó gasto de Majo · Majo te debe $${f.amount||0}`;
+    if(f.paidBy==="majo" && f.forWhom==="mane") return `👩 Majo pagó gasto de Mane · Tú le debes $${f.amount||0}`;
+    if(f.paidBy==="mane" && f.forWhom==="mane") return "👤 Tu propio gasto · no afecta el balance";
+    if(f.paidBy==="majo" && f.forWhom==="majo") return "👩 Gasto propio de Majo · no afecta el balance";
+    return "";
+  }
+
   function save(){
     if(!f.amount||+f.amount<=0||!f.desc.trim())return;
-    onSave({id:Date.now(),...f,amount:+f.amount,description:f.desc.trim(),category:f.cat});onClose();
+    const who=deriveWho();
+    onSave({id:Date.now(),...f,who,amount:+f.amount,description:f.desc.trim(),category:f.cat});
+    onClose();
   }
+
+  const msg=balanceMsg();
+  const msgColor=msg.startsWith("🤝")?"var(--joint)":msg.startsWith("🧑")?"var(--yo)":msg.startsWith("👩")?"var(--ella)":"var(--txt2)";
+
   return(
     <div style={{position:"fixed",inset:0,background:"#00000090",zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center",backdropFilter:"blur(6px)"}}
       onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div className="rise" style={{background:"var(--s1)",borderRadius:"22px 22px 0 0",border:"1px solid var(--b1)",borderBottom:"none",padding:"20px 18px 36px",width:"100%",maxWidth:430}}>
+      <div className="rise" style={{background:"var(--s1)",borderRadius:"22px 22px 0 0",border:"1px solid var(--b1)",borderBottom:"none",padding:"20px 18px 36px",width:"100%",maxWidth:430,maxHeight:"92vh",overflowY:"auto"}}>
         <div style={{width:34,height:3,borderRadius:2,background:"var(--b2)",margin:"0 auto 16px"}}/>
         <div style={{display:"flex",gap:5,justifyContent:"center",marginBottom:20}}>
           {STEPS.map((_,i)=><div key={i} className={`step-dot${i<=step?" on":""}`}/>)}
         </div>
+
+        {/* STEP 0 — Tipo */}
         {step===0&&(
           <div className="up">
             <div className="lbl" style={{textAlign:"center",marginBottom:14}}>¿Qué es?</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:8}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
               {[{id:"gasto",e:"💸",l:"Gasto"},{id:"ingreso",e:"💰",l:"Ingreso"}].map(t=>(
                 <button key={t.id} onClick={()=>{sf("type",t.id);setStep(1);}} style={{padding:"22px 8px",borderRadius:16,border:`2px solid ${f.type===t.id?"var(--yo)":"var(--b1)"}`,background:f.type===t.id?"#4f8aff14":"var(--s2)",color:f.type===t.id?"var(--yo)":"var(--txt2)",fontSize:13,fontWeight:700}}>
                   <div style={{fontSize:28,marginBottom:6}}>{t.e}</div>{t.l}
@@ -255,6 +287,8 @@ function QuickForm({onSave,onClose}){
             </div>
           </div>
         )}
+
+        {/* STEP 1 — Monto */}
         {step===1&&(
           <div className="up">
             <div className="lbl" style={{textAlign:"center",marginBottom:10}}>¿Cuánto y en qué?</div>
@@ -270,42 +304,49 @@ function QuickForm({onSave,onClose}){
             <button onClick={()=>{if(f.amount&&f.desc.trim())setStep(2);}} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:f.amount&&f.desc.trim()?"linear-gradient(135deg,var(--yo),#9b6fff)":"var(--b1)",color:f.amount&&f.desc.trim()?"#fff":"var(--txt3)",fontSize:14,fontWeight:700}}>Siguiente →</button>
           </div>
         )}
+
+        {/* STEP 2 — ¿Quién pagó? + ¿Para quién era? */}
         {step===2&&(
           <div className="up">
-            <div className="lbl" style={{textAlign:"center",marginBottom:14}}>¿Tipo de gasto?</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:f.who==="compartido"?14:0}}>
-              {WHOS.map(w=>(
-                <button key={w.id} onClick={()=>sf("who",w.id)} style={{padding:"16px 8px",borderRadius:14,border:`2px solid ${f.who===w.id?w.c:"var(--b1)"}`,background:f.who===w.id?`${w.c}18`:"var(--s2)",color:f.who===w.id?w.c:"var(--txt2)",fontSize:12,fontWeight:700}}>
-                  <div style={{fontSize:22,marginBottom:5}}>{w.e}</div>
-                  <div>{w.label}</div>
-                  <div style={{fontSize:10,opacity:.6,marginTop:2}}>{w.hint}</div>
+            {/* ¿Quién pagó físicamente? */}
+            <div className="lbl" style={{textAlign:"center",marginBottom:10}}>¿Quién pagó?</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:16}}>
+              {[{id:"mane",e:"🧑",l:"Mane"},{id:"majo",e:"👩",l:"Majo"}].map(p=>(
+                <button key={p.id} onClick={()=>sf("paidBy",p.id)} style={{padding:"14px 8px",borderRadius:14,border:`2px solid ${f.paidBy===p.id?"var(--yo)":"var(--b1)"}`,background:f.paidBy===p.id?"#4f8aff18":"var(--s2)",color:f.paidBy===p.id?"var(--yo)":"var(--txt2)",fontSize:14,fontWeight:700}}>
+                  <div style={{fontSize:24,marginBottom:4}}>{p.e}</div>{p.l}
                 </button>
               ))}
             </div>
-            {/* If compartido, ask who physically paid */}
-            {f.who==="compartido"&&(
-              <div style={{marginTop:4}}>
-                <div className="lbl" style={{textAlign:"center",marginBottom:10}}>¿Quién pagó físicamente?</div>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:14}}>
-                  {[{id:"mane",e:"🧑",l:"Mane pagó"},{id:"majo",e:"👩",l:"Majo pagó"}].map(p=>(
-                    <button key={p.id} onClick={()=>sf("paidBy",p.id)} style={{padding:"12px 8px",borderRadius:14,border:`2px solid ${f.paidBy===p.id?"var(--joint)":"var(--b1)"}`,background:f.paidBy===p.id?"#00d68f18":"var(--s2)",color:f.paidBy===p.id?"var(--joint)":"var(--txt2)",fontSize:12,fontWeight:700}}>
-                      <div style={{fontSize:20,marginBottom:4}}>{p.e}</div>{p.l}
-                    </button>
-                  ))}
-                </div>
+
+            {/* ¿Para quién era el gasto? */}
+            <div className="lbl" style={{textAlign:"center",marginBottom:10}}>¿De quién era el gasto?</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+              {[
+                {id:"ambos",   e:"🤝", l:"De los dos",  hint:"50% cada quien"},
+                {id:"mane",    e:"🧑", l:"De Mane",     hint:"Gasto de Mane"},
+                {id:"majo",    e:"👩", l:"De Majo",     hint:"Gasto de Majo"},
+                {id:"personal",e:"👤", l:"Personal mío",hint:"No afecta balance"},
+              ].map(fw=>(
+                <button key={fw.id} onClick={()=>sf("forWhom",fw.id)} style={{padding:"12px 6px",borderRadius:14,border:`2px solid ${f.forWhom===fw.id?"var(--joint)":"var(--b1)"}`,background:f.forWhom===fw.id?"#00d68f18":"var(--s2)",color:f.forWhom===fw.id?"var(--joint)":"var(--txt2)",fontSize:11,fontWeight:700,textAlign:"center"}}>
+                  <div style={{fontSize:20,marginBottom:3}}>{fw.e}</div>
+                  <div>{fw.l}</div>
+                  <div style={{fontSize:9,opacity:.6,marginTop:2}}>{fw.hint}</div>
+                </button>
+              ))}
+            </div>
+
+            {/* Balance preview */}
+            {msg&&(
+              <div style={{background:"var(--b1)",borderRadius:10,padding:"10px 12px",fontSize:12,color:msgColor,fontWeight:600,marginBottom:12,lineHeight:1.4}}>
+                {msg}
               </div>
             )}
-            {/* Explanation of what it means */}
-            <div style={{background:"var(--b1)",borderRadius:10,padding:"10px 12px",fontSize:11,color:"var(--txt2)",marginTop:4}}>
-              {f.who==="yo"     && "🧑 Mane pagó un gasto de Majo → Majo te debe el total"}
-              {f.who==="ella"   && "👩 Majo pagó un gasto de Mane → Tú le debes el total"}
-              {f.who==="compartido" && f.paidBy==="mane" && "🤝 Gasto 50/50 · Mane pagó → Majo te debe la mitad"}
-              {f.who==="compartido" && f.paidBy==="majo" && "🤝 Gasto 50/50 · Majo pagó → Tú le debes la mitad"}
-              {f.who==="personal" && "👤 Gasto solo tuyo · no afecta el balance"}
-            </div>
-            <button onClick={()=>setStep(3)} style={{width:"100%",padding:13,borderRadius:14,border:"none",background:"linear-gradient(135deg,var(--yo),#9b6fff)",color:"#fff",fontSize:14,fontWeight:700,marginTop:12}}>Siguiente →</button>
+
+            <button onClick={()=>setStep(3)} style={{width:"100%",padding:13,borderRadius:14,border:"none",background:"linear-gradient(135deg,var(--yo),#9b6fff)",color:"#fff",fontSize:14,fontWeight:700}}>Siguiente →</button>
           </div>
         )}
+
+        {/* STEP 3 — Categoría */}
         {step===3&&(
           <div className="up">
             <div className="lbl" style={{textAlign:"center",marginBottom:12}}>Categoría</div>
@@ -318,23 +359,27 @@ function QuickForm({onSave,onClose}){
             </div>
           </div>
         )}
+
+        {/* STEP 4 — Confirmar */}
         {step===4&&(
           <div className="up">
             <div className="lbl" style={{textAlign:"center",marginBottom:16}}>Confirmar</div>
             <div style={{background:"var(--s2)",border:"1px solid var(--b1)",borderRadius:16,padding:16,marginBottom:16}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
                 <span style={{color:"var(--txt2)",fontSize:13}}>{f.type==="gasto"?"💸 Gasto":"💰 Ingreso"}</span>
-                <span className="amt" style={{fontSize:22,color:f.type==="ingreso"?"var(--inc)":who?.c}}>{$mxn(+f.amount)}</span>
+                <span className="amt" style={{fontSize:24,color:"var(--txt)"}}>{$mxn(+f.amount)}</span>
               </div>
-              <div style={{fontSize:15,fontWeight:700,marginBottom:8}}>{f.desc}</div>
-              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                <span className="pill" style={{background:`${who?.c}18`,color:who?.c}}>{who?.e} {who?.label}</span>
-                {f.who==="compartido"&&<span className="pill" style={{background:"#00d68f18",color:"var(--joint)"}}>Pagó: {f.paidBy==="mane"?"🧑 Mane":"👩 Majo"}</span>}
+              <div style={{fontSize:15,fontWeight:700,marginBottom:10}}>{f.desc}</div>
+              <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>
                 <span className="pill" style={{background:`${cat?.c}18`,color:cat?.c}}>{cat?.e} {cat?.label}</span>
                 <span className="pill" style={{background:"var(--b1)",color:"var(--txt2)"}}>{$d(f.date)}</span>
               </div>
+              {/* Balance impact summary */}
+              <div style={{background:"var(--b1)",borderRadius:10,padding:"10px 12px",fontSize:12,color:msgColor,fontWeight:600,lineHeight:1.4}}>
+                {msg}
+              </div>
             </div>
-            <button onClick={save} style={{width:"100%",padding:15,borderRadius:14,border:"none",background:"linear-gradient(135deg,var(--yo),#9b6fff)",color:"#fff",fontSize:15,fontWeight:800,boxShadow:"0 6px 22px #4f8aff35",marginBottom:8}}>✓ Guardar</button>
+            <button onClick={save} style={{width:"100%",padding:15,borderRadius:14,border:"none",background:"linear-gradient(135deg,var(--yo),#9b6fff)",color:"#fff",fontSize:15,fontWeight:800,marginBottom:8}}>✓ Guardar</button>
             <button onClick={()=>setStep(0)} style={{width:"100%",padding:11,borderRadius:14,border:"1px solid var(--b1)",background:"none",color:"var(--txt2)",fontSize:13,fontWeight:600}}>Editar</button>
           </div>
         )}
