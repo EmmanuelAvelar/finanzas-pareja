@@ -5,11 +5,22 @@ const G = () => (
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@700;800&display=swap');
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:#07080f; --s1:#0d0e1a; --s2:#121320; --b1:#1e2035; --b2:#272944;
-      --txt:#eeeeff; --txt2:#8889aa; --txt3:#44455e;
-      --yo:#4f8aff; --ella:#ff5599; --joint:#00d68f; --personal:#ffb830;
-      --danger:#ff4f6a; --inc:#00d68f;
-      --body:'Plus Jakarta Sans',sans-serif; --head:'Space Grotesk',sans-serif;
+      --bg:#f0f2f8;
+      --s1:#ffffff;
+      --s2:#ffffff;
+      --b1:#e4e7f0;
+      --b2:#d0d4e8;
+      --txt:#0f1132;
+      --txt2:#6b7099;
+      --txt3:#adb3cc;
+      --yo:#3b6ff5;
+      --ella:#e8336d;
+      --joint:#00a86b;
+      --personal:#e07b00;
+      --danger:#e8336d;
+      --inc:#00a86b;
+      --body:'Plus Jakarta Sans',sans-serif;
+      --head:'Space Grotesk',sans-serif;
     }
     html,body{background:var(--bg);font-family:var(--body);color:var(--txt);}
     input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
@@ -20,75 +31,124 @@ const G = () => (
     .up  {animation:up  .3s ease both;}
     .rise{animation:rise .28s cubic-bezier(.32,.72,0,1) both;}
 
-    /* ── NAV: 5 icons + FAB slot in center ── */
+    /* ── NAV: una sola fila, 6 columnas iguales ── */
     .nav{
       display:grid;
-      grid-template-columns:1fr 1fr 72px 1fr 1fr;
-      background:var(--s1);
+      grid-template-columns:repeat(6,1fr);
+      background:#fff;
       border-top:1px solid var(--b1);
       position:fixed;bottom:0;left:50%;transform:translateX(-50%);
       width:100%;max-width:430px;z-index:90;
-      padding-bottom:env(safe-area-inset-bottom,8px);
+      padding-bottom:env(safe-area-inset-bottom,4px);
+      box-shadow:0 -4px 20px #0f11320a;
     }
     .nav-btn{
       display:flex;flex-direction:column;align-items:center;justify-content:center;
-      gap:3px;padding:10px 0 12px;border:none;background:none;
-      color:var(--txt3);font-size:9px;font-weight:700;letter-spacing:.4px;transition:color .15s;
+      gap:2px;padding:8px 2px 10px;border:none;background:none;
+      color:var(--txt3);font-size:8px;font-weight:700;letter-spacing:.2px;transition:color .15s;
+      min-width:0;overflow:hidden;
     }
     .nav-btn.active{color:var(--yo);}
-    .nav-btn.active.p{color:var(--personal);}
-    .nav-slot{/* empty center slot for FAB */}
-    .nav-btn .dot{width:4px;height:4px;border-radius:2px;background:currentColor;opacity:0;transition:opacity .15s;margin-top:1px;}
+    .nav-btn .nav-icon{font-size:18px;line-height:1;margin-bottom:1px;}
+    .nav-btn .dot{width:3px;height:3px;border-radius:2px;background:currentColor;opacity:0;transition:opacity .15s;margin-top:1px;}
     .nav-btn.active .dot{opacity:1;}
 
-    /* FAB — centered above nav */
-    .fab{
-      position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
-      width:58px;height:58px;border-radius:29px;
-      background:linear-gradient(135deg,var(--yo),#9b6fff);
-      border:3px solid var(--bg);color:#fff;font-size:26px;
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 6px 28px #4f8aff50;z-index:92;transition:transform .15s,box-shadow .15s;
+    /* FAB integrado en la nav — misma altura que los botones */
+    .nav-fab{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:6px 2px 10px;border:none;background:none;
     }
-    .fab:active{transform:translateX(-50%) scale(.92);box-shadow:0 3px 12px #4f8aff30;}
+    .nav-fab-circle{
+      width:40px;height:40px;border-radius:20px;
+      background:linear-gradient(135deg,var(--yo),#6b4fff);
+      color:#fff;font-size:22px;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 14px #3b6ff540;
+      transition:transform .15s,box-shadow .15s;
+    }
+    .nav-fab:active .nav-fab-circle{transform:scale(.92);}
 
-    .card{background:var(--s2);border:1px solid var(--b1);border-radius:18px;padding:16px;margin-bottom:10px;}
-    .card-ghost{border-style:dashed;background:transparent;}
-    .row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:14px;margin-bottom:7px;transition:border-color .15s;}
+    /* Cards */
+    .card{background:#fff;border:1px solid var(--b1);border-radius:18px;padding:16px;margin-bottom:10px;box-shadow:0 2px 12px #0f11320a;}
+    .card-ghost{border-style:dashed;background:transparent;box-shadow:none;}
+
+    /* Rows */
+    .row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#fff;border:1px solid var(--b1);border-radius:14px;margin-bottom:7px;transition:border-color .15s;box-shadow:0 1px 6px #0f11320a;}
     .row:hover{border-color:var(--b2);}
     .ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
     .del{background:none;border:none;color:var(--txt3);font-size:18px;line-height:1;padding:2px 6px;border-radius:7px;transition:color .12s,background .12s;}
-    .del:hover{color:var(--danger);background:#ff4f6a15;}
+    .del:hover{color:var(--danger);background:#e8336d12;}
     .lbl{font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--txt3);margin-bottom:6px;}
     .amt{font-family:var(--head);font-weight:800;letter-spacing:-.5px;line-height:1;}
     .pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.3px;}
-    .cho{border-radius:11px;border:1.5px solid var(--b1);background:var(--s1);color:var(--txt2);font-size:12px;font-weight:700;padding:10px 6px;text-align:center;transition:all .12s;}
+    .cho{border-radius:11px;border:1.5px solid var(--b1);background:#f7f8fc;color:var(--txt2);font-size:12px;font-weight:700;padding:10px 6px;text-align:center;transition:all .12s;}
     .cho:active{transform:scale(.96);}
-    .cat{padding:6px 11px;border-radius:20px;border:1.5px solid var(--b1);background:var(--s1);color:var(--txt2);font-size:11px;font-weight:700;transition:all .12s;}
+    .cat{padding:6px 11px;border-radius:20px;border:1.5px solid var(--b1);background:#f7f8fc;color:var(--txt2);font-size:11px;font-weight:700;transition:all .12s;}
     .bar-track{background:var(--b1);border-radius:4px;height:5px;overflow:hidden;margin-top:4px;}
     .bar-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.22,.68,0,1.2);}
     .step-dot{width:6px;height:6px;border-radius:3px;background:var(--b2);transition:all .2s;}
     .step-dot.on{background:var(--yo);width:18px;}
 
-    /* Sync status bar */
+    /* Sync bar */
     .sync-bar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:200;padding:8px 16px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;transition:all .3s;}
-    .sync-bar.loading{background:#1a1a2e;color:var(--yo);}
-    .sync-bar.error  {background:#2a0a10;color:var(--danger);}
-    .sync-bar.ok     {background:#0a1f14;color:var(--joint);}
+    .sync-bar.loading{background:#eef2ff;color:var(--yo);}
+    .sync-bar.error{background:#fff0f3;color:var(--danger);}
+    .sync-bar.ok{background:#f0fdf8;color:var(--joint);}
     @keyframes spin{to{transform:rotate(360deg)}}
     .spinner{width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+
+    /* Bottom sheet — ajuste real a pantalla del celular */
+    .sheet-overlay{
+      position:fixed;inset:0;background:#00000055;z-index:200;
+      display:flex;align-items:flex-end;justify-content:center;
+      backdrop-filter:blur(4px);
+    }
+    .sheet-inner{
+      background:#fff;
+      border-radius:22px 22px 0 0;
+      border:1px solid var(--b1);
+      border-bottom:none;
+      padding:20px 18px 0;
+      padding-bottom:max(env(safe-area-inset-bottom,16px),16px);
+      width:100%;
+      max-width:430px;
+      max-height:85dvh;
+      max-height:85vh;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .hero-card{
+      background:linear-gradient(135deg,#2952d9 0%,#6b4fff 100%);
+      border-radius:24px;
+      padding:24px 20px;
+      color:#fff;
+      margin-bottom:16px;
+      box-shadow:0 8px 32px #3b6ff530;
+    }
+
+    /* Quick action buttons */
+    .qa-btn{
+      display:flex;flex-direction:column;align-items:center;gap:6px;
+      background:#f0f2f8;border:none;border-radius:14px;padding:12px 8px;
+      font-size:10px;font-weight:700;color:var(--txt2);transition:all .15s;flex:1;
+    }
+    .qa-btn:active{transform:scale(.95);background:var(--b1);}
+    .qa-icon{width:38px;height:38px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px #0f11320f;}
   `}</style>
 );
 
 const CATS=[
-  {id:"casa",e:"🏠",label:"Casa",c:"#ff6060"},
-  {id:"comida",e:"🍔",label:"Comida",c:"#ffb830"},
-  {id:"transporte",e:"🚗",label:"Transporte",c:"#00d68f"},
-  {id:"salud",e:"💊",label:"Salud",c:"#4f8aff"},
-  {id:"entretenimiento",e:"🎬",label:"Entretenim.",c:"#b06fff"},
-  {id:"servicios",e:"💡",label:"Servicios",c:"#ff8c30"},
-  {id:"ropa",e:"👗",label:"Ropa",c:"#ff5599"},
-  {id:"otros",e:"📦",label:"Otros",c:"#666888"},
+  {id:"casa",e:"🏠",label:"Casa",c:"#4f8aff"},
+  {id:"comida",e:"🍔",label:"Comida",c:"#ff8c30"},
+  {id:"transporte",e:"🚗",label:"Transporte",c:"#00b37a"},
+  {id:"salud",e:"💊",label:"Salud",c:"#b06fff"},
+  {id:"entretenimiento",e:"🎬",label:"Entretenim.",c:"#ff5599"},
+  {id:"servicios",e:"💡",label:"Servicios",c:"#ffb830"},
+  {id:"ropa",e:"👗",label:"Ropa",c:"#ff6060"},
+  {id:"amazon",e:"📦",label:"Amazon",c:"#ff9900"},
+  {id:"carlo",e:"🧑‍🍳",label:"Carlo",c:"#00c2a8"},
+  {id:"diversion",e:"🎉",label:"Diversión",c:"#7c3aed"},
+  {id:"otros",e:"📁",label:"Otros",c:"#888aaa"},
 ];
 const WHOS=[
   {id:"personal",e:"👤",label:"Personal",c:"#ffb830",hint:"Solo tuyo"},
@@ -266,10 +326,10 @@ function QuickForm({onSave,onClose}){
   const msgColor=msg.startsWith("🤝")?"var(--joint)":msg.startsWith("🧑")?"var(--yo)":msg.startsWith("👩")?"var(--ella)":"var(--txt2)";
 
   return(
-    <div style={{position:"fixed",inset:0,background:"#00000090",zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center",backdropFilter:"blur(6px)"}}
+    <div className="sheet-overlay" style={{zIndex:200}}
       onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div className="rise" style={{background:"var(--s1)",borderRadius:"22px 22px 0 0",border:"1px solid var(--b1)",borderBottom:"none",padding:"20px 18px 36px",width:"100%",maxWidth:430,maxHeight:"92vh",overflowY:"auto"}}>
-        <div style={{width:34,height:3,borderRadius:2,background:"var(--b2)",margin:"0 auto 16px"}}/>
+      <div className="rise sheet-inner">
+        <div style={{width:34,height:3,borderRadius:2,background:"var(--b1)",margin:"0 auto 16px"}}/>
         <div style={{display:"flex",gap:5,justifyContent:"center",marginBottom:20}}>
           {STEPS.map((_,i)=><div key={i} className={`step-dot${i<=step?" on":""}`}/>)}
         </div>
@@ -295,12 +355,12 @@ function QuickForm({onSave,onClose}){
             <div style={{position:"relative",marginBottom:10}}>
               <span style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",fontFamily:"var(--head)",fontSize:22,fontWeight:800,color:"var(--txt3)"}}>$</span>
               <input ref={amtRef} type="number" value={f.amount} onChange={e=>sf("amount",e.target.value)} placeholder="0" inputMode="numeric"
-                style={{width:"100%",background:"var(--s2)",border:`1.5px solid ${f.amount?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"16px 14px 16px 36px",color:"var(--txt)",fontSize:28,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
+                style={{width:"100%",background:"#f7f8fc",border:`1.5px solid ${f.amount?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"16px 14px 16px 36px",color:"var(--txt)",fontSize:28,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
             </div>
             <input value={f.desc} onChange={e=>sf("desc",e.target.value)} placeholder="¿En qué? (ej: Cena, Uber…)"
-              style={{width:"100%",background:"var(--s2)",border:`1.5px solid ${f.desc?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"13px 14px",color:"var(--txt)",fontSize:14,marginBottom:10}}/>
+              style={{width:"100%",background:"#f7f8fc",border:`1.5px solid ${f.desc?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"13px 14px",color:"var(--txt)",fontSize:14,marginBottom:10}}/>
             <input type="date" value={f.date} onChange={e=>sf("date",e.target.value)}
-              style={{width:"100%",background:"var(--s2)",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,marginBottom:14,colorScheme:"dark"}}/>
+              style={{width:"100%",background:"#f7f8fc",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,marginBottom:14,colorScheme:"dark"}}/>
             <button onClick={()=>{if(f.amount&&f.desc.trim())setStep(2);}} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:f.amount&&f.desc.trim()?"linear-gradient(135deg,var(--yo),#9b6fff)":"var(--b1)",color:f.amount&&f.desc.trim()?"#fff":"var(--txt3)",fontSize:14,fontWeight:700}}>Siguiente →</button>
           </div>
         )}
@@ -364,7 +424,7 @@ function QuickForm({onSave,onClose}){
         {step===4&&(
           <div className="up">
             <div className="lbl" style={{textAlign:"center",marginBottom:16}}>Confirmar</div>
-            <div style={{background:"var(--s2)",border:"1px solid var(--b1)",borderRadius:16,padding:16,marginBottom:16}}>
+            <div style={{background:"#f7f8fc",border:"1px solid var(--b1)",borderRadius:16,padding:16,marginBottom:16}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
                 <span style={{color:"var(--txt2)",fontSize:13}}>{f.type==="gasto"?"💸 Gasto":"💰 Ingreso"}</span>
                 <span className="amt" style={{fontSize:24,color:"var(--txt)"}}>{$mxn(+f.amount)}</span>
@@ -398,10 +458,10 @@ function EditForm({r,onSave,onClose}){
     onSave({...r,...f,amount:+f.amount,description:f.description.trim()});onClose();
   }
   return(
-    <div style={{position:"fixed",inset:0,background:"#00000092",zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center",backdropFilter:"blur(6px)"}}
+    <div className="sheet-overlay" style={{zIndex:200}}
       onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div className="rise" style={{background:"var(--s1)",borderRadius:"22px 22px 0 0",border:"1px solid var(--b1)",borderBottom:"none",padding:"20px 18px 36px",width:"100%",maxWidth:430,maxHeight:"92vh",overflowY:"auto"}}>
-        <div style={{width:34,height:3,borderRadius:2,background:"var(--b2)",margin:"0 auto 16px"}}/>
+      <div className="rise sheet-inner">
+        <div style={{width:34,height:3,borderRadius:2,background:"var(--b1)",margin:"0 auto 16px"}}/>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
           <div style={{fontFamily:"var(--head)",fontSize:18,fontWeight:800}}>✏️ Editar movimiento</div>
           <span className="pill" style={{background:"#4f8aff18",color:"var(--yo)"}}>{$d(r.date)}</span>
@@ -416,14 +476,14 @@ function EditForm({r,onSave,onClose}){
         <div style={{position:"relative",marginBottom:12}}>
           <span style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",fontFamily:"var(--head)",fontSize:20,fontWeight:800,color:"var(--txt3)"}}>$</span>
           <input type="number" value={f.amount} onChange={e=>sf("amount",e.target.value)} inputMode="numeric"
-            style={{width:"100%",background:"var(--s2)",border:`1.5px solid ${f.amount?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"13px 14px 13px 34px",color:"var(--txt)",fontSize:22,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
+            style={{width:"100%",background:"#f7f8fc",border:`1.5px solid ${f.amount?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"13px 14px 13px 34px",color:"var(--txt)",fontSize:22,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
         </div>
         <div className="lbl">Descripción</div>
         <input value={f.description} onChange={e=>sf("description",e.target.value)}
-          style={{width:"100%",background:"var(--s2)",border:`1.5px solid ${f.description?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"12px 14px",color:"var(--txt)",fontSize:14,marginBottom:14}}/>
+          style={{width:"100%",background:"#f7f8fc",border:`1.5px solid ${f.description?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"12px 14px",color:"var(--txt)",fontSize:14,marginBottom:14}}/>
         <div className="lbl">Fecha</div>
         <input type="date" value={f.date} onChange={e=>sf("date",e.target.value)}
-          style={{width:"100%",background:"var(--s2)",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,marginBottom:14,colorScheme:"dark"}}/>
+          style={{width:"100%",background:"#f7f8fc",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,marginBottom:14,colorScheme:"dark"}}/>
         <div className="lbl">¿Quién pagó?</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
           {WHOS.map(w=>(
@@ -438,7 +498,7 @@ function EditForm({r,onSave,onClose}){
             </button>
           ))}
         </div>
-        <div style={{background:"var(--s2)",border:"1px solid var(--b1)",borderRadius:14,padding:"12px 14px",marginBottom:14}}>
+        <div style={{background:"#f7f8fc",border:"1px solid var(--b1)",borderRadius:14,padding:"12px 14px",marginBottom:14}}>
           <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"var(--txt3)",marginBottom:8}}>VISTA PREVIA</div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
             <div>
@@ -468,18 +528,18 @@ function LoanForm({onSave,onClose,existingNames}){
     onSave({id:Date.now(),name:name.trim(),amount:+amount,note:note.trim(),date,paid:false,abonos:[]});onClose();
   }
   return(
-    <div style={{position:"fixed",inset:0,background:"#00000090",zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center",backdropFilter:"blur(6px)"}}
+    <div className="sheet-overlay" style={{zIndex:200}}
       onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div className="rise" style={{background:"var(--s1)",borderRadius:"22px 22px 0 0",border:"1px solid var(--b1)",borderBottom:"none",padding:"20px 18px 36px",width:"100%",maxWidth:430}}>
+      <div className="rise sheet-inner">
         <div style={{width:34,height:3,borderRadius:2,background:"var(--b2)",margin:"0 auto 18px"}}/>
         <div style={{fontFamily:"var(--head)",fontSize:18,fontWeight:800,marginBottom:18}}>💸 Nuevo préstamo</div>
         <div style={{marginBottom:10,position:"relative"}}>
           <div className="lbl">¿A quién le prestas?</div>
           <input value={name} onChange={e=>{setName(e.target.value);setShowSug(true);}} onFocus={()=>setShowSug(true)}
             placeholder="Nombre de la persona"
-            style={{width:"100%",background:"var(--s2)",border:`1.5px solid ${name?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"13px 14px",color:"var(--txt)",fontSize:14}}/>
+            style={{width:"100%",background:"#f7f8fc",border:`1.5px solid ${name?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"13px 14px",color:"var(--txt)",fontSize:14}}/>
           {showSug&&suggestions.length>0&&(
-            <div style={{position:"absolute",top:"100%",left:0,right:0,background:"var(--s2)",border:"1px solid var(--b1)",borderRadius:12,zIndex:10,overflow:"hidden",marginTop:4}}>
+            <div style={{position:"absolute",top:"100%",left:0,right:0,background:"#f7f8fc",border:"1px solid var(--b1)",borderRadius:12,zIndex:10,overflow:"hidden",marginTop:4}}>
               {suggestions.map(s=>(
                 <button key={s} onClick={()=>{setName(s);setShowSug(false);}} style={{width:"100%",padding:"11px 14px",background:"none",border:"none",borderBottom:"1px solid var(--b1)",color:"var(--txt)",fontSize:13,fontWeight:600,textAlign:"left"}}
                   onMouseOver={e=>e.target.style.background="var(--b1)"} onMouseOut={e=>e.target.style.background="none"}>👤 {s}</button>
@@ -492,18 +552,18 @@ function LoanForm({onSave,onClose,existingNames}){
           <div style={{position:"relative"}}>
             <span style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",fontFamily:"var(--head)",fontSize:20,fontWeight:800,color:"var(--txt3)"}}>$</span>
             <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0" inputMode="numeric"
-              style={{width:"100%",background:"var(--s2)",border:`1.5px solid ${amount?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"14px 14px 14px 34px",color:"var(--txt)",fontSize:24,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
+              style={{width:"100%",background:"#f7f8fc",border:`1.5px solid ${amount?"var(--yo)":"var(--b1)"}`,borderRadius:14,padding:"14px 14px 14px 34px",color:"var(--txt)",fontSize:24,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
           </div>
         </div>
         <div style={{marginBottom:10}}>
           <div className="lbl">Nota (opcional)</div>
           <input value={note} onChange={e=>setNote(e.target.value)} placeholder="Ej: para la renta, emergencia…"
-            style={{width:"100%",background:"var(--s2)",border:"1.5px solid var(--b1)",borderRadius:14,padding:"12px 14px",color:"var(--txt)",fontSize:13}}/>
+            style={{width:"100%",background:"#f7f8fc",border:"1.5px solid var(--b1)",borderRadius:14,padding:"12px 14px",color:"var(--txt)",fontSize:13}}/>
         </div>
         <div style={{marginBottom:18}}>
           <div className="lbl">Fecha</div>
           <input type="date" value={date} onChange={e=>setDate(e.target.value)}
-            style={{width:"100%",background:"var(--s2)",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,colorScheme:"dark"}}/>
+            style={{width:"100%",background:"#f7f8fc",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,colorScheme:"dark"}}/>
         </div>
         <button onClick={save} style={{width:"100%",padding:15,borderRadius:14,border:"none",background:name.trim()&&amount&&+amount>0?"linear-gradient(135deg,var(--personal),#ff8c00)":"var(--b1)",color:name.trim()&&amount&&+amount>0?"#000":"var(--txt3)",fontSize:15,fontWeight:800}}>Registrar préstamo</button>
       </div>
@@ -521,16 +581,16 @@ function AbonoForm({deuda,pendiente,onSave,onClose}){
     onSave({id:Date.now(),deudaId:deuda,amount:+amount,note:note.trim(),date});onClose();
   }
   return(
-    <div style={{position:"fixed",inset:0,background:"#00000090",zIndex:210,display:"flex",alignItems:"flex-end",justifyContent:"center",backdropFilter:"blur(6px)"}}
+    <div className="sheet-overlay" style={{zIndex:210}}
       onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div className="rise" style={{background:"var(--s1)",borderRadius:"22px 22px 0 0",border:"1px solid var(--b1)",borderBottom:"none",padding:"20px 18px 36px",width:"100%",maxWidth:430}}>
+      <div className="rise sheet-inner">
         <div style={{width:34,height:3,borderRadius:2,background:"var(--b2)",margin:"0 auto 18px"}}/>
         <div style={{fontFamily:"var(--head)",fontSize:18,fontWeight:800,marginBottom:6}}>💵 Registrar abono</div>
         <div style={{fontSize:12,color:"var(--txt2)",marginBottom:18}}>Pendiente: <span style={{color:"var(--personal)",fontWeight:700}}>{$mxn(pendiente)}</span></div>
         <div style={{position:"relative",marginBottom:12}}>
           <span style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",fontFamily:"var(--head)",fontSize:20,fontWeight:800,color:"var(--txt3)"}}>$</span>
           <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="0" inputMode="numeric"
-            style={{width:"100%",background:"var(--s2)",border:`1.5px solid ${amount?"var(--joint)":"var(--b1)"}`,borderRadius:14,padding:"14px 14px 14px 34px",color:"var(--txt)",fontSize:24,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
+            style={{width:"100%",background:"#f7f8fc",border:`1.5px solid ${amount?"var(--joint)":"var(--b1)"}`,borderRadius:14,padding:"14px 14px 14px 34px",color:"var(--txt)",fontSize:24,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
         </div>
         {+amount>0&&+amount<pendiente&&(
           <div style={{background:"#ffb83010",border:"1px solid #ffb83030",borderRadius:10,padding:"8px 12px",fontSize:12,color:"var(--personal)",marginBottom:10}}>
@@ -543,9 +603,9 @@ function AbonoForm({deuda,pendiente,onSave,onClose}){
           </div>
         )}
         <input value={note} onChange={e=>setNote(e.target.value)} placeholder="Nota (opcional)"
-          style={{width:"100%",background:"var(--s2)",border:"1.5px solid var(--b1)",borderRadius:14,padding:"12px 14px",color:"var(--txt)",fontSize:13,marginBottom:10}}/>
+          style={{width:"100%",background:"#f7f8fc",border:"1.5px solid var(--b1)",borderRadius:14,padding:"12px 14px",color:"var(--txt)",fontSize:13,marginBottom:10}}/>
         <input type="date" value={date} onChange={e=>setDate(e.target.value)}
-          style={{width:"100%",background:"var(--s2)",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,marginBottom:18,colorScheme:"dark"}}/>
+          style={{width:"100%",background:"#f7f8fc",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,marginBottom:18,colorScheme:"dark"}}/>
         <button onClick={save} style={{width:"100%",padding:15,borderRadius:14,border:"none",background:amount&&+amount>0?"linear-gradient(135deg,var(--joint),#00b37a)":"var(--b1)",color:amount&&+amount>0?"#000":"var(--txt3)",fontSize:15,fontWeight:800}}>Confirmar abono</button>
       </div>
     </div>
@@ -564,18 +624,18 @@ function PagoPareja({diff,onSave,onClose}){
     onSave({id:Date.now(),amount:+amount,note:note.trim(),date,de:quienPaga,para:quienRecibe});onClose();
   }
   return(
-    <div style={{position:"fixed",inset:0,background:"#00000090",zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center",backdropFilter:"blur(6px)"}}
+    <div className="sheet-overlay" style={{zIndex:200}}
       onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div className="rise" style={{background:"var(--s1)",borderRadius:"22px 22px 0 0",border:"1px solid var(--b1)",borderBottom:"none",padding:"20px 18px 36px",width:"100%",maxWidth:430}}>
+      <div className="rise sheet-inner">
         <div style={{width:34,height:3,borderRadius:2,background:"var(--b2)",margin:"0 auto 18px"}}/>
         <div style={{fontFamily:"var(--head)",fontSize:18,fontWeight:800,marginBottom:6}}>✅ Registrar pago</div>
-        <div style={{background:"var(--s2)",border:"1px solid var(--b1)",borderRadius:14,padding:"12px 14px",marginBottom:16,fontSize:13,color:"var(--txt2)"}}>
+        <div style={{background:"#f7f8fc",border:"1px solid var(--b1)",borderRadius:14,padding:"12px 14px",marginBottom:16,fontSize:13,color:"var(--txt2)"}}>
           <span style={{fontWeight:700,color:"var(--txt)"}}>{quienPaga}</span> le paga a <span style={{fontWeight:700,color:"var(--txt)"}}>{quienRecibe}</span>
         </div>
         <div style={{position:"relative",marginBottom:10}}>
           <span style={{position:"absolute",left:14,top:"50%",transform:"translateY(-50%)",fontFamily:"var(--head)",fontSize:20,fontWeight:800,color:"var(--txt3)"}}>$</span>
           <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} inputMode="numeric"
-            style={{width:"100%",background:"var(--s2)",border:`1.5px solid ${amount?"var(--joint)":"var(--b1)"}`,borderRadius:14,padding:"14px 14px 14px 34px",color:"var(--txt)",fontSize:24,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
+            style={{width:"100%",background:"#f7f8fc",border:`1.5px solid ${amount?"var(--joint)":"var(--b1)"}`,borderRadius:14,padding:"14px 14px 14px 34px",color:"var(--txt)",fontSize:24,fontFamily:"var(--head)",fontWeight:800,letterSpacing:-1}}/>
         </div>
         {+amount>0&&+amount<Math.abs(diff)&&(
           <div style={{background:"#ffb83010",border:"1px solid #ffb83030",borderRadius:10,padding:"8px 12px",fontSize:12,color:"var(--personal)",marginBottom:10}}>
@@ -583,9 +643,9 @@ function PagoPareja({diff,onSave,onClose}){
           </div>
         )}
         <input value={note} onChange={e=>setNote(e.target.value)} placeholder="Nota (opcional)"
-          style={{width:"100%",background:"var(--s2)",border:"1.5px solid var(--b1)",borderRadius:14,padding:"12px 14px",color:"var(--txt)",fontSize:13,marginBottom:10}}/>
+          style={{width:"100%",background:"#f7f8fc",border:"1.5px solid var(--b1)",borderRadius:14,padding:"12px 14px",color:"var(--txt)",fontSize:13,marginBottom:10}}/>
         <input type="date" value={date} onChange={e=>setDate(e.target.value)}
-          style={{width:"100%",background:"var(--s2)",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,marginBottom:18,colorScheme:"dark"}}/>
+          style={{width:"100%",background:"#f7f8fc",border:"1.5px solid var(--b1)",borderRadius:14,padding:"11px 14px",color:"var(--txt)",fontSize:13,marginBottom:18,colorScheme:"dark"}}/>
         <button onClick={save} style={{width:"100%",padding:15,borderRadius:14,border:"none",background:amount&&+amount>0?"linear-gradient(135deg,var(--joint),#00b37a)":"var(--b1)",color:amount&&+amount>0?"#000":"var(--txt3)",fontSize:15,fontWeight:800}}>✓ Registrar pago</button>
       </div>
     </div>
@@ -814,8 +874,8 @@ export default function App(){
     return{tg,ti,yp,ep,cp,ptg,diff:rawDiff,adjDiff,cats,pcats,allCats,allTotal,mc,pmc,amc,recent,months};
   },[recs,pagos]);
 
-  const bc=S.adjDiff>0?"var(--inc)":S.adjDiff<0?"var(--danger)":"var(--personal)";
-  const bt=S.adjDiff>0?`Majo te debe ${$mxn(Math.abs(S.adjDiff))}`:S.adjDiff<0?`Le debes a Majo ${$mxn(Math.abs(S.adjDiff))}`:"¡A mano! 🎉";
+  const bc=S.adjDiff>0?"var(--inc)":S.adjDiff<0?"var(--danger)":"var(--yo)";
+  const bt=S.adjDiff>0?`Majo debe a Mane ${$mxn(Math.abs(S.adjDiff))}`:S.adjDiff<0?`Mane debe a Majo ${$mxn(Math.abs(S.adjDiff))}`:"¡A mano! 🎉";
 
   const pRecs=recs.filter(r=>r.who==="personal");
   const cRecs=recs.filter(r=>r.who!=="personal");
@@ -861,53 +921,74 @@ export default function App(){
         {/* ══ HOME ══ */}
         {tab==="home"&&(
           <div style={{padding:`${syncStatus!=="idle"?"36px":"0"} 0 8px`}}>
-            <div style={{background:"linear-gradient(180deg,#0d0e20 0%,var(--bg) 100%)",padding:"32px 18px 20px"}}>
-              <div style={{fontSize:10,fontWeight:700,letterSpacing:2,color:"var(--yo)",marginBottom:6}}>FINANZAS EN PAREJA</div>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+            {/* Header */}
+            <div style={{padding:"32px 18px 16px",background:"#fff",borderBottom:"1px solid var(--b1)"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
                 <div>
-                  <div style={{fontFamily:"var(--head)",fontSize:26,fontWeight:800,letterSpacing:-.5}}>Mi Billetera</div>
-                  <div style={{fontSize:12,color:"var(--txt2)",marginTop:3}}>{new Date().toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long"})}</div>
+                  <div style={{fontSize:12,color:"var(--txt2)",marginBottom:2}}>Bienvenido 👋</div>
+                  <div style={{fontFamily:"var(--head)",fontSize:20,fontWeight:800,color:"var(--txt)"}}>Mane & Majo</div>
                 </div>
-                <div style={{display:"flex",flexDirection:"column",gap:6,alignItems:"flex-end"}}>
-                  <div style={{background:S.adjDiff===0?"var(--s2)":`${bc}18`,border:`1px solid ${bc}44`,borderRadius:14,padding:"9px 13px",textAlign:"right",maxWidth:160,cursor:"pointer"}} onClick={()=>setTab("balance")}>
-                    <div style={{fontSize:9,fontWeight:700,letterSpacing:1.5,color:bc,marginBottom:3}}>BALANCE PAREJA</div>
-                    <div className="amt" style={{fontSize:13,color:bc,lineHeight:1.2}}>{bt}</div>
-                  </div>
-                  <button onClick={refresh} style={{background:"none",border:"1px solid var(--b1)",borderRadius:8,padding:"4px 10px",color:"var(--txt3)",fontSize:10,fontWeight:700,display:"flex",alignItems:"center",gap:4}}>
-                    🔄 Actualizar
-                  </button>
+                <button onClick={refresh} style={{width:38,height:38,borderRadius:12,border:"1px solid var(--b1)",background:"var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>🔄</button>
+              </div>
+
+              {/* Hero balance card */}
+              <div className="hero-card" onClick={()=>setTab("balance")} style={{cursor:"pointer"}}>
+                <div style={{fontSize:11,fontWeight:700,letterSpacing:2,opacity:.75,marginBottom:8}}>BALANCE DE PAREJA</div>
+                <div style={{fontFamily:"var(--head)",fontSize:32,fontWeight:800,marginBottom:4,letterSpacing:-1}}>
+                  {$mxn(Math.abs(S.adjDiff))}
+                </div>
+                <div style={{fontSize:13,opacity:.85,marginBottom:16}}>
+                  {S.adjDiff>0?"Majo debe a Mane":S.adjDiff<0?"Mane debe a Majo":"¡Están a mano! 🎉"}
+                </div>
+                <div style={{display:"flex",gap:12}}>
+                  {[
+                    {label:"Mane pagó",value:S.yp,color:"#a5c4ff"},
+                    {label:"Majo pagó",value:S.ep,color:"#ffb3ce"},
+                    {label:"Compartido",value:S.cp,color:"#a7f3d0"},
+                  ].map(k=>(
+                    <div key={k.label} style={{flex:1,background:"#ffffff18",borderRadius:10,padding:"8px 10px"}}>
+                      <div style={{fontSize:9,fontWeight:700,letterSpacing:1,color:k.color,marginBottom:3}}>{k.label.toUpperCase()}</div>
+                      <div style={{fontFamily:"var(--head)",fontSize:13,fontWeight:800,color:"#fff"}}>{$mxn(k.value)}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-            <div style={{padding:"0 14px"}}>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:12}}>
+
+              {/* Quick actions */}
+              <div style={{display:"flex",gap:8}}>
                 {[
-                  {label:"Mane",value:S.yp+S.ptg,color:"var(--danger)",icon:"💸"},
-                  {label:"Majo",value:S.ep,color:"var(--ella)",icon:"👩"},
-                  {label:"Compartidos",value:S.cp,color:"var(--joint)",icon:"🤝"},
-                ].map(k=>(
-                  <div key={k.label} className="card up" style={{marginBottom:0,padding:"13px 11px"}}>
-                    <div style={{fontSize:16,marginBottom:5}}>{k.icon}</div>
-                    <div style={{fontSize:9,fontWeight:700,letterSpacing:1,color:"var(--txt3)",marginBottom:3}}>{k.label.toUpperCase()}</div>
-                    <div className="amt" style={{fontSize:14,color:k.color}}>{$mxn(k.value)}</div>
-                  </div>
+                  {icon:"💸",label:"Gasto",action:()=>setForm(true)},
+                  {icon:"📊",label:"Análisis",action:()=>setTab("dashboard")},
+                  {icon:"⚖️",label:"Balance",action:()=>setTab("balance")},
+                  {icon:"🤝",label:"Préstamos",action:()=>setTab("prestamos")},
+                ].map(q=>(
+                  <button key={q.label} className="qa-btn" onClick={q.action}>
+                    <div className="qa-icon">{q.icon}</div>
+                    {q.label}
+                  </button>
                 ))}
               </div>
-              <div className="card up" style={{marginBottom:12,background:"linear-gradient(135deg,#161100,var(--s2))",borderColor:"#ffb83022"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+            </div>
+
+            <div style={{padding:"16px 14px 0"}}>
+              {/* Personal summary */}
+              <div className="card up" style={{marginBottom:12,borderLeft:`3px solid var(--personal)`}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                   <div>
-                    <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"var(--personal)",marginBottom:3}}>👤 PERSONAL</div>
-                    <div className="amt" style={{fontSize:20,color:"var(--personal)"}}>{$mxn(S.ptg)}</div>
+                    <div style={{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"var(--personal)",marginBottom:3}}>👤 GASTOS PERSONALES</div>
+                    <div className="amt" style={{fontSize:22,color:"var(--txt)"}}>{$mxn(S.ptg)}</div>
                   </div>
                   <div style={{textAlign:"right"}}>
                     <div style={{fontSize:9,color:"var(--txt3)",letterSpacing:1,marginBottom:3}}>NETO PAREJA</div>
-                    <div className="amt" style={{fontSize:13,color:S.ti-S.tg>=0?"var(--inc)":"var(--danger)"}}>{$mxn(S.ti-S.tg)}</div>
+                    <div className="amt" style={{fontSize:15,color:S.ti-S.tg>=0?"var(--inc)":"var(--danger)"}}>{$mxn(S.ti-S.tg)}</div>
                   </div>
                 </div>
-                {S.pcats.length>0&&<Bar label={S.pcats[0].label} value={S.pcats[0].v} max={S.pmc} color={S.pcats[0].c}/>}
+                {S.pcats.length>0&&<div style={{marginTop:10}}><Bar label={S.pcats[0].label} value={S.pcats[0].v} max={S.pmc} color={S.pcats[0].c}/></div>}
               </div>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-                <div className="lbl" style={{marginBottom:0}}>Últimos movimientos</div>
+
+              {/* Recent transactions */}
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                <div style={{fontFamily:"var(--head)",fontSize:15,fontWeight:800,color:"var(--txt)"}}>Movimientos recientes</div>
                 {recs.length>5&&<button onClick={()=>setTab("historial")} style={{fontSize:11,color:"var(--yo)",background:"none",border:"none",fontWeight:700}}>Ver todos →</button>}
               </div>
               {S.recent.length===0
@@ -933,7 +1014,7 @@ export default function App(){
               {["all",...S.months].map(m=>(
                 <button key={m} onClick={()=>setSelMonth(m)} style={{
                   flexShrink:0,padding:"6px 14px",borderRadius:20,border:`1.5px solid ${selMonth===m?"var(--yo)":"var(--b1)"}`,
-                  background:selMonth===m?"#4f8aff18":"var(--s2)",color:selMonth===m?"var(--yo)":"var(--txt2)",
+                  background:selMonth===m?"#3b6ff518":"var(--bg)",color:selMonth===m?"var(--yo)":"var(--txt2)",
                   fontSize:12,fontWeight:700,whiteSpace:"nowrap",
                 }}>{m==="all"?"Todo el tiempo":monthLabel(m)}</button>
               ))}
@@ -1298,30 +1379,29 @@ export default function App(){
           );
         })()}
 
-        {/* ══ NAV ══ */}
+        {/* ══ NAV — una sola fila ══ */}
         <nav className="nav">
           {NAV_TABS.slice(0,2).map(t=>(
             <button key={t.id} className={`nav-btn${tab===t.id?" active":""}`} onClick={()=>setTab(t.id)}>
-              <span style={{fontSize:16}}>{t.e}</span>
+              <span className="nav-icon">{t.e}</span>
               <span>{t.label}</span>
               <div className="dot"/>
             </button>
           ))}
-          {/* FAB placeholder */}
-          <div className="nav-slot"/>
+          {/* FAB en el centro */}
+          <button className="nav-fab" onClick={()=>setForm(true)}>
+            <div className="nav-fab-circle">＋</div>
+          </button>
           {NAV_TABS.slice(2).map(t=>(
-            <button key={t.id} className={`nav-btn${tab===t.id?" active"+(t.id==="prestamos"?" p":""):""}${t.id==="prestamos"?" p":""}`}
+            <button key={t.id} className={`nav-btn${tab===t.id?" active":""}`}
               onClick={()=>setTab(t.id)}
               style={t.id==="prestamos"&&tab===t.id?{color:"var(--personal)"}:t.id==="prestamos"?{color:"var(--txt3)"}:{}}>
-              <span style={{fontSize:16}}>{t.e}</span>
+              <span className="nav-icon">{t.e}</span>
               <span>{t.label}</span>
               <div className="dot" style={t.id==="prestamos"?{background:"var(--personal)"}:{}}/>
             </button>
           ))}
         </nav>
-
-        {/* FAB */}
-        <button className="fab" onClick={()=>setForm(true)}>＋</button>
 
         {/* Modals */}
         {form&&<QuickForm onSave={add} onClose={()=>setForm(false)}/>}
